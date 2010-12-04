@@ -1,14 +1,14 @@
 
 int armed_status = 0;
 int button_light_pin = 2;
-int armed_pin = 4;
-int big_button_pin = 7;
+const int armed_pin = 4;
+const int big_button_pin = 7;
 
 int big_button_status = LOW;
 int big_button_last_status = LOW;
 
 long time = 0;
-long debounce = 300;
+const long debounce = 300;
 
 long next_deploy = 0;
 
