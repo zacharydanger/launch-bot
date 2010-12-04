@@ -24,6 +24,7 @@ void loop() {
 	check_armed();
 	light_button();
 	read_button();
+	deploy_code();
 }
 
 /**
