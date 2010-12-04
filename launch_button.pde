@@ -47,7 +47,7 @@ void light_button() {
  */
 void read_button() {
 	big_button_status = digitalRead(big_button_pin);
-	if(HIGH == big_button_status && LOW == big_button_last_status && millis() - time > debounce) {
+	if(HIGH == big_button_status && LOW == big_button_last_status && millis() - time > debounce && HIGH == armed_status) {
 		time = millis();
 		next_deploy = millis() + 500;
 	}
