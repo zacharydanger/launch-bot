@@ -70,6 +70,9 @@ void loop() {
 	pulse_all_pins();
 }
 
+/**
+ * Loops through all pins and pulses them if need be.
+ */
 void pulse_all_pins() {
 	for(int i = 0; i <= 5; i++) {
 		if(pulse_pins[i] > 0) {
@@ -80,6 +83,9 @@ void pulse_all_pins() {
 	}
 }
 
+/**
+ * Pulses an LED with a shit-ton of criteria.
+ */
 void pulse_led(int pin, long &next_time, unsigned int &modifier, int &next_val, int next_bump = 50, int step = 10, int low_val = 0, int high_val = 255) {
 	if(millis() > next_time) {
 		analogWrite(pin, next_val);
@@ -97,6 +103,9 @@ void pulse_led(int pin, long &next_time, unsigned int &modifier, int &next_val, 
 	}
 }
 
+/**
+ * Pulses the pin for a given index.
+ */
 void pulse_by_index(int index) {
 	pulse_led(led_pins[index], changes[index], modifier[index], pulse_vals[index], pulse_deltas[index], pulse_steps[index], pulse_low[index], pulse_high[index]);
 }
