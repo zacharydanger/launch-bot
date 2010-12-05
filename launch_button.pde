@@ -64,7 +64,6 @@ void setup() {
 }
 
 void loop() {
-	check_armed();
 	light_button();
 	read_button();
 	deploy_code();
@@ -103,18 +102,11 @@ void pulse_by_index(int index) {
 }
 
 /**
- * Checks whether or not the toggle switch has been armed.
- */
-void check_armed() {
-	armed_status = digitalRead(armed_pin);
-}
-
-/**
  * Triggers the relay to turn on the big red button's
  * 12V light.
  */
 void light_button() {
-	digitalWrite(button_light_pin, armed_status);
+	digitalWrite(button_light_pin, digitalRead(armed_pin));
 }
 
 /**
