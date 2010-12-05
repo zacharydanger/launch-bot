@@ -17,12 +17,25 @@ const int led_pins[6] = {dev_green, dev_yellow, dev_red, live_green, live_yellow
 
 int pulse_pins[6] = {0, 0, 0, 0, 0, 0};
 
+//how many milliseconds between steps?
+const int yellow_speed = 30;
+//lowest value for yellow LEDs
+const int yellow_low = 16;
+
+//amount to change in single step
+const int red_speed = 325;
+const int red_step = 255;
+
 //threading via arrays?
 long changes[6] = {0, 0, 0, 0, 0, 0};
 unsigned int modifier[6] = {1, 1, 1, 1, 1, 1};
 int pulse_vals[6] = {0, 0, 0, 0, 0, 0};
-int pulse_deltas[6] = {25, 30, 350, 40, 45, 350};
-int pulse_steps[6] = {10, 10, 255, 10, 10, 255};
+
+int pulse_deltas[6] = {25, yellow_speed, red_speed, 40, yellow_speed, red_speed};
+int pulse_steps[6] = {10, 10, red_step, 10, 10, red_step};
+
+int pulse_low[6] = {0, yellow_low, 0, 0, yellow_low, 0};
+int pulse_high[6] = {255, 255, 255, 255, 255, 255};
 
 int dev_status_index = 0;
 
@@ -55,41 +68,38 @@ void loop() {
 	light_button();
 	read_button();
 	deploy_code();
-
-	pulse_pins[0] = 1;
-	pulse_pins[1] = 1; //turn on yellow pin
-	pulse_pins[2] = 1;
-
-	pulse_pins[3] = 1;
-	pulse_pins[4] = 1;
-	pulse_pins[5] = 1;
-
 	pulse_any_pin();
 }
 
-void pulse_thing(int pin, long &next_time, unsigned int &modifier, int &next_val, int next_bump = 50, int step = 10) {
+void pulse_thing(int pin, long &next_time, unsigned int &modifier, int &next_val, int next_bump = 50, int step = 10, int low_val = 0, int high_val = 255) {
 	if(millis() > next_time) {
 		analogWrite(pin, next_val);
 
 		next_time = millis() + next_bump;
 		next_val += (step * modifier);
 
-		if(next_val >= 255) {
+		if(next_val >= high_val) {
 			modifier = -1;
-		} else if(next_val <= 0) {
+		} else if(next_val <= low_val) {
 			modifier = 1;
 		}
 
-		next_val = constrain(next_val, 0, 255);
+		next_val = constrain(next_val, low_val, high_val);
 	}
 }
 
 void pulse_any_pin() {
 	for(int i = 0; i <= 5; i++) {
-		if(1 == pulse_pins[i]) {
-			pulse_thing(led_pins[i], changes[i], modifier[i], pulse_vals[i], pulse_deltas[i], pulse_steps[i]);
+		if(pulse_pins[i] > 0) {
+			pulse_by_index(i);
+		} else {
+			analogWrite(led_pins[i], 0);
 		}
 	}
+}
+
+void pulse_by_index(int index) {
+	pulse_thing(led_pins[index], changes[index], modifier[index], pulse_vals[index], pulse_deltas[index], pulse_steps[index], pulse_low[index], pulse_high[index]);
 }
 
 /**
@@ -127,6 +137,7 @@ void read_button() {
 void deploy_code() {
 	if(millis() >= next_deploy && next_deploy > 0) {
 		Serial.println("TODO: Deploying!");
+		pulse_pins[4] = 1;
 		next_deploy = 0;
 	}
 }
