@@ -9,16 +9,20 @@ const int dev_green = 3;
 const int dev_yellow = 5;
 const int dev_red = 6;
 
-const int led_pins[3] = {dev_green, dev_yellow, dev_red};
+const int live_green = 9;
+const int live_yellow = 10;
+const int live_red = 11;
 
-int pulse_pins[3] = {0, 0, 0};
+const int led_pins[6] = {dev_green, dev_yellow, dev_red, live_green, live_yellow, live_red};
+
+int pulse_pins[6] = {0, 0, 0, 0, 0, 0};
 
 //threading via arrays?
-long changes[3] = {0, 0, 0};
-unsigned int modifier[3] = {1, 1, 1};
-int pulse_vals[3] = {0, 0, 0};
-int pulse_deltas[3] = {100, 50, 25};
-int pulse_steps[3] = {50, 25, 12};
+long changes[6] = {0, 0, 0, 0, 0, 0};
+unsigned int modifier[6] = {1, 1, 1, 1, 1, 1};
+int pulse_vals[6] = {0, 0, 0, 0, 0, 0};
+int pulse_deltas[6] = {100, 50, 25, 25, 25, 25};
+int pulse_steps[6] = {50, 25, 12, 10, 10, 10};
 
 int dev_status_index = 0;
 
@@ -39,6 +43,10 @@ void setup() {
 	pinMode(dev_yellow, OUTPUT);
 	pinMode(dev_red, OUTPUT);
 
+	pinMode(live_green, OUTPUT);
+	pinMode(live_yellow, OUTPUT);
+	pinMode(live_red, OUTPUT);
+
 	Serial.begin(9600);
 }
 
@@ -48,8 +56,13 @@ void loop() {
 	read_button();
 	deploy_code();
 
+	pulse_pins[0] = 1;
 	pulse_pins[1] = 1; //turn on yellow pin
 	pulse_pins[2] = 1;
+
+	pulse_pins[3] = 1;
+	pulse_pins[4] = 1;
+	pulse_pins[5] = 1;
 
 	pulse_any_pin();
 }
@@ -72,7 +85,7 @@ void pulse_thing(int pin, long &next_time, unsigned int &modifier, int &next_val
 }
 
 void pulse_any_pin() {
-	for(int i = 0; i <= 2; i++) {
+	for(int i = 0; i <= 5; i++) {
 		if(1 == pulse_pins[i]) {
 			pulse_thing(led_pins[i], changes[i], modifier[i], pulse_vals[i], pulse_deltas[i], pulse_steps[i]);
 		}
