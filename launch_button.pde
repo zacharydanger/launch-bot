@@ -71,6 +71,16 @@ void loop() {
 	pulse_any_pin();
 }
 
+void pulse_any_pin() {
+	for(int i = 0; i <= 5; i++) {
+		if(pulse_pins[i] > 0) {
+			pulse_by_index(i);
+		} else {
+			analogWrite(led_pins[i], 0);
+		}
+	}
+}
+
 void pulse_led(int pin, long &next_time, unsigned int &modifier, int &next_val, int next_bump = 50, int step = 10, int low_val = 0, int high_val = 255) {
 	if(millis() > next_time) {
 		analogWrite(pin, next_val);
@@ -85,16 +95,6 @@ void pulse_led(int pin, long &next_time, unsigned int &modifier, int &next_val, 
 		}
 
 		next_val = constrain(next_val, low_val, high_val);
-	}
-}
-
-void pulse_any_pin() {
-	for(int i = 0; i <= 5; i++) {
-		if(pulse_pins[i] > 0) {
-			pulse_by_index(i);
-		} else {
-			analogWrite(led_pins[i], 0);
-		}
 	}
 }
 
