@@ -21,8 +21,8 @@ int pulse_pins[6] = {0, 0, 0, 0, 0, 0};
 long changes[6] = {0, 0, 0, 0, 0, 0};
 unsigned int modifier[6] = {1, 1, 1, 1, 1, 1};
 int pulse_vals[6] = {0, 0, 0, 0, 0, 0};
-int pulse_deltas[6] = {100, 50, 25, 25, 25, 25};
-int pulse_steps[6] = {50, 25, 12, 10, 10, 10};
+int pulse_deltas[6] = {25, 30, 350, 40, 45, 350};
+int pulse_steps[6] = {10, 10, 255, 10, 10, 255};
 
 int dev_status_index = 0;
 
