@@ -68,10 +68,10 @@ void loop() {
 	light_button();
 	read_button();
 	deploy_code();
-	pulse_any_pin();
+	pulse_all_pins();
 }
 
-void pulse_any_pin() {
+void pulse_all_pins() {
 	for(int i = 0; i <= 5; i++) {
 		if(pulse_pins[i] > 0) {
 			pulse_by_index(i);
