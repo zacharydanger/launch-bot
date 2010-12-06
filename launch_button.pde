@@ -1,3 +1,5 @@
+#include <SPI.h>
+#include <Ethernet.h>
 
 int armed_status = 0;
 int button_light_pin = 2;
@@ -47,6 +49,18 @@ const long debounce = 300;
 
 long next_deploy = 0;
 
+byte mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+byte ip[] = { 192,168,1,177 };
+byte gateway[] = { 192,168,1,1};
+byte server[] = { 192,168,1,112 }; // Google
+
+Client client(server, 80);
+
+long next_dev_check = 0;
+long next_dev_reconnect = 0;
+
+String dev_status = "none";
+
 void setup() {
 	pinMode(button_light_pin, OUTPUT);
 	pinMode(armed_pin, INPUT);
@@ -60,6 +74,9 @@ void setup() {
 	pinMode(live_yellow, OUTPUT);
 	pinMode(live_red, OUTPUT);
 
+	Ethernet.begin(mac, ip, gateway);
+	delay(1000);
+
 	Serial.begin(9600);
 }
 
@@ -67,14 +84,63 @@ void loop() {
 	light_button();
 	read_button();
 	deploy_code();
+
+	if(millis() > next_dev_check) {
+		check_dev_status();
+		next_dev_check = millis() + 5000;
+	}
+
+	pulse_pins[0] = 0;
+	pulse_pins[1] = 0;
+	pulse_pins[2] = 0;
+	if(dev_status == "good") {
+		pulse_pins[0] = 1;
+	} else if(dev_status == "build") {
+		pulse_pins[1] = 1;
+	} else if(dev_status == "bad") {
+		pulse_pins[2] = 1;
+	}
+
 	pulse_all_pins();
+}
+
+void check_dev_status() {
+	Serial.print("Trying to connect...");
+
+	if(client.connect()) {
+		Serial.print(" connected!\n");
+		client.println("GET /ard.php HTTP1.0");
+		client.println();
+
+		delay(1000);
+
+		String line = "";
+		while(client.available()) {
+			char c = client.read();
+			line.concat(c);
+
+			if(c == '\n') {
+				line = "";
+			}
+
+			if(!client.available()) {
+				dev_status = line;
+				Serial.println(dev_status);
+			}
+		}
+
+	} else {
+		Serial.print(" failed.\n");
+	}
+
+	client.stop();
 }
 
 /**
  * Loops through all pins and pulses them if need be.
  */
 void pulse_all_pins() {
-	for(int i = 0; i <= 5; i++) {
+	for(int i = 0; i <= 2; i++) {
 		if(pulse_pins[i] > 0) {
 			pulse_by_index(i);
 		} else {
